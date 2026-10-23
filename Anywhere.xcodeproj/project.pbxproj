@@ -18,8 +18,7 @@
 		CB71CDC52F837D11002B9E1D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB71CDC42F837D11002B9E1D /* WidgetKit.framework */; };
 		CB71CDC72F837D11002B9E1D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB71CDC62F837D11002B9E1D /* SwiftUI.framework */; };
 		CB71CDD42F837D11002B9E1D /* Anywhere Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CB71CDC32F837D11002B9E1D /* Anywhere Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		CBFA0DE000000000000000C1 /* AnywhereRules in Frameworks */ = {isa = PBXBuildFile; productRef = CBFA0DE000000000000000B1 /* AnywhereRules */; };
-		CBFA0DE000000000000000C2 /* AnywhereRules in Frameworks */ = {isa = PBXBuildFile; productRef = CBFA0DE000000000000000B2 /* AnywhereRules */; };
+
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -501,7 +500,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBFA0DE000000000000000C1 /* AnywhereRules in Frameworks */,
 				3853794130753258000675B7 /* AnywhereQUIC in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -520,7 +518,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBFA0DE000000000000000C2 /* AnywhereRules in Frameworks */,
 				385379433075325D000675B7 /* AnywhereQUIC in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -645,7 +642,6 @@
 			);
 			name = Anywhere;
 			packageProductDependencies = (
-				CBFA0DE000000000000000B1 /* AnywhereRules */,
 				3853794030753258000675B7 /* AnywhereQUIC */,
 			);
 			productName = Anywhere;
@@ -696,7 +692,6 @@
 			);
 			name = "Anywhere TV";
 			packageProductDependencies = (
-				CBFA0DE000000000000000B2 /* AnywhereRules */,
 				385379423075325D000675B7 /* AnywhereQUIC */,
 			);
 			productName = Anywhere;
@@ -773,7 +768,6 @@
 			mainGroup = CB1C105C2F23B81500B74CD8;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				CBFA0DE000000000000000A1 /* XCRemoteSwiftPackageReference "AnywhereRules" */,
 				38B2C4A0307A1F0100D4E6F1 /* XCLocalSwiftPackageReference "Packages/AnywhereIP" */,
 				38B2C4A1307A1F0100D4E6F1 /* XCLocalSwiftPackageReference "Packages/AnywhereQUIC" */,
 			);
@@ -1647,16 +1641,7 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		CBFA0DE000000000000000A1 /* XCRemoteSwiftPackageReference "AnywhereRules" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/hiDandelion/AnywhereRules.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
+
 
 /* Begin XCSwiftPackageProductDependency section */
 		382A1870306A04490032C2BF /* AnywhereIP */ = {
@@ -1675,16 +1660,8 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = AnywhereQUIC;
 		};
-		CBFA0DE000000000000000B1 /* AnywhereRules */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = CBFA0DE000000000000000A1 /* XCRemoteSwiftPackageReference "AnywhereRules" */;
-			productName = AnywhereRules;
-		};
-		CBFA0DE000000000000000B2 /* AnywhereRules */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = CBFA0DE000000000000000A1 /* XCRemoteSwiftPackageReference "AnywhereRules" */;
-			productName = AnywhereRules;
-		};
+
+
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CB1C105D2F23B81500B74CD8 /* Project object */;

@@ -8,7 +8,7 @@
 import Foundation
 import SQLite3
 import Synchronization
-import AnywhereRules
+
 
 nonisolated private let logger = AnywhereLogger(category: "RoutingRulesDatabase")
 
@@ -18,8 +18,8 @@ nonisolated final class RoutingRulesDatabase: Sendable {
     private let databaseHandle: Mutex<OpaquePointer?>
 
     private init() {
-        guard let url = AnywhereRules.databaseURL else {
-            logger.error("[RoutingRulesDatabase] Rules.db not found in AnywhereRules bundle")
+        guard let url = Bundle.main.url(forResource: "Rules", withExtension: "db") else {
+            logger.warning("LX Native: upstream private Rules.db is unavailable; use imported rules or Global mode")
             self.databaseHandle = Mutex(nil)
             return
         }

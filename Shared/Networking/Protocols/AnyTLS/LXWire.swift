@@ -84,9 +84,9 @@ nonisolated enum LXTransport {
             let dl = try await TLSClient(configuration: downloadTLS).connect(host: dlHost, port: dlPort)
             let down = XHTTPConnection(download: TLSByteTransport(dl), configuration: configuration(host: dlHost, path: dlPath), mode: .streamUp, sessionId: session, useHTTP2: true)
             down.configureRole(.downloadOnly)
-            down.attachUploadChannel(up)
             do {
-                try await down.performLegSetup()
+                try await down.performSetup()
+                down.attachUploadChannel(up)
                 return LXObfsConnection(inner: XHTTPProxyConnection(xhttpConnection: down), key: options.obfsKey)
             } catch { down.cancel(); throw error }
         } catch { up.cancel(); throw error }
