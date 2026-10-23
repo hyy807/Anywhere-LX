@@ -6,6 +6,9 @@ for p in list(app.rglob('_CodeSignature')):
 for p in app.rglob('embedded.mobileprovision'): p.unlink()
 for bundle in [app,*app.glob('PlugIns/*.appex')]:
     info=plistlib.loads((bundle/'Info.plist').read_bytes())
+    info['CFBundleDisplayName']='LX Native' if bundle==app else 'LX Tunnel'
+    info['CFBundleName']='LX Native' if bundle==app else 'LX Tunnel'
+    (bundle/'Info.plist').write_bytes(plistlib.dumps(info))
     subprocess.run(['codesign','--remove-signature',str(bundle/info['CFBundleExecutable'])],check=False)
     ent={'com.apple.security.application-groups':['group.org.hyy807.lxnative'],'com.apple.developer.networking.networkextension':['packet-tunnel-provider']}
     (Path('delivery')/('App.entitlements.plist' if bundle==app else 'Tunnel.entitlements.plist')).write_bytes(plistlib.dumps(ent))

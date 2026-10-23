@@ -44,8 +44,9 @@ jobs:
           mkdir -p delivery/Payload
           cp -R build/Build/Products/Release-iphoneos/Anywhere.app delivery/Payload/LXNative.app
           python3 scripts/package_lx.py
+          (cd delivery && zip -qr LXNative-ios-arm64-unsigned.ipa Payload)
+          python3 scripts/verify_ipa.py delivery/LXNative-ios-arm64-unsigned.ipa
           cd delivery
-          zip -qr LXNative-ios-arm64-unsigned.ipa Payload
           shasum -a 256 LXNative-ios-arm64-unsigned.ipa > SHA256SUMS
       - uses: actions/upload-artifact@v4
         if: always()
@@ -54,6 +55,7 @@ jobs:
           path: |
             delivery/*.ipa
             delivery/*.plist
+            delivery/*.json
             delivery/SHA256SUMS
             build.log
             simulator-tests.log
