@@ -6,6 +6,7 @@ p=Path('Anywhere.xcodeproj/project.pbxproj')
 s=p.read_text().replace('com.argsment.Anywhere','org.hyy807.lxnative')
 s=re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = "";', s)
 s=s.replace('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;', 'ASSETCATALOG_COMPILER_APPICON_NAME = LXIcon;')
+s=re.sub(r'ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = [^;]*;', 'ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "";', s)
 p.write_text(s)
 for name in ['Anywhere','Anywhere Network Extension']:
     p=Path(name)/'Info.plist'
