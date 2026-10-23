@@ -84,10 +84,11 @@ extension QUICConnectionCore {
         }
 
         let host = WeakConnectionBox(value: owner)
-        rootTask = Task { [host, transport, obfuscator, sealStream, localAddr] in
+        let streamForDriver = sealStream
+        rootTask = Task.detached { [host, transport, obfuscator, streamForDriver, localAddr] in
             await Self.runTransportDriver(
                 host: host, transport: transport, obfuscator: obfuscator,
-                sealStream: sealStream, localAddr: localAddr
+                sealStream: streamForDriver, localAddr: localAddr
             )
         }
     }
