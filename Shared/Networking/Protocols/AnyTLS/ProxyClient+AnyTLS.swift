@@ -19,10 +19,11 @@ extension ProxyClient {
         let directHost = directDialHost
         let directPort = configuration.serverPort
         let tunnel = self.tunnel
+        let authorityHost = configuration.serverAddress
 
         let dialOut: AnyTLSMultiplexerPool.DialOut = {
             if let options = anytls.lxHTTP {
-                return try await LXTransport.connect(host: directHost, port: directPort, tls: tlsConfig, options: options, tunnel: tunnel)
+                return try await LXTransport.connect(host: directHost, port: directPort, authorityHost: authorityHost, tls: tlsConfig, options: options, tunnel: tunnel)
             }
             let tlsClient = TLSClient(configuration: tlsConfig)
             let tlsConnection: TLSRecordConnection

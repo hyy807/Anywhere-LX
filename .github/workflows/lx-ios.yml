@@ -35,6 +35,10 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild -project Anywhere.xcodeproj -scheme Anywhere -configuration Release -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM='' IPHONEOS_DEPLOYMENT_TARGET=18.0 build 2>&1 | tee build.log
+      - name: Parser and import regressions on iOS simulator
+        run: |
+          DEVICE=$(python3 -c 'import json,subprocess; d=json.loads(subprocess.check_output(["xcrun","simctl","list","devices","available","-j"])); print(next(v["udid"] for values in d["devices"].values() for v in values if "iPhone" in v["name"]))')
+          xcodebuild -project Anywhere.xcodeproj -scheme Anywhere -configuration Debug -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath sim-build CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM='' IPHONEOS_DEPLOYMENT_TARGET=18.0 -only-testing:'Anywhere Tests/LXImportTests' test > simulator-tests.log 2>&1
       - name: Package
         run: |
           mkdir -p delivery/Payload
@@ -52,4 +56,5 @@ jobs:
             delivery/*.plist
             delivery/SHA256SUMS
             build.log
+            simulator-tests.log
           if-no-files-found: warn

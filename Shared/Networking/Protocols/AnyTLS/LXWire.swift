@@ -61,7 +61,7 @@ nonisolated final class LXObfsConnection: ProxyConnection {
 }
 
 nonisolated enum LXTransport {
-    static func connect(host: String, port: UInt16, tls: TLSConfiguration, options: LXHTTPConfiguration, tunnel: ProxyConnection?) async throws -> ProxyConnection {
+    static func connect(host: String, port: UInt16, authorityHost: String, tls: TLSConfiguration, options: LXHTTPConfiguration, tunnel: ProxyConnection?) async throws -> ProxyConnection {
         guard tunnel == nil else { throw LXWire.failure("LX split transport cannot reuse one chain tunnel for two TLS connections") }
         let session = UUID().uuidString.lowercased()
         func configuration(host: String, path: String) -> XHTTPConfiguration {
@@ -71,19 +71,23 @@ nonisolated enum LXTransport {
         let dlHost = options.download.isEmpty ? host : options.download
         let dlPort = options.downloadPort ?? port
         let dlPath = options.downloadPath.isEmpty ? options.path : options.downloadPath
-        let uploadTLS = TLSConfiguration(serverName: tls.serverName, alpn: ["h2"], echEnabled: tls.echEnabled, echConfig: tls.echConfig, fingerprint: tls.fingerprint)
-        let downloadTLS = TLSConfiguration(serverName: options.download.isEmpty ? tls.serverName : dlHost, alpn: ["h2"], echEnabled: tls.echEnabled, echConfig: tls.echConfig, fingerprint: tls.fingerprint)
+        let uploadTLS = TLSConfiguration(serverName: tls.serverName, alpn: ["h2"], minVersion: tls.minVersion, maxVersion: tls.maxVersion, echEnabled: tls.echEnabled, echConfig: tls.echConfig, fingerprint: tls.fingerprint, insecureSkipVerify: tls.insecureSkipVerify)
+        let downloadTLS = TLSConfiguration(serverName: options.download.isEmpty ? tls.serverName : dlHost, alpn: ["h2"], minVersion: tls.minVersion, maxVersion: tls.maxVersion, echEnabled: tls.echEnabled, echConfig: tls.echConfig, fingerprint: tls.fingerprint, insecureSkipVerify: tls.insecureSkipVerify)
         let u = TLSClient(configuration: uploadTLS)
         let upload: TLSRecordConnection
         if let tunnel { upload = try await u.connect(overTunnel: tunnel) }
         else { upload = try await u.connect(host: host, port: port) }
-        let up = XHTTPConnection(download: TLSByteTransport(upload), configuration: configuration(host: host, path: options.path), mode: .streamUp, sessionId: session, useHTTP2: true)
+        func authority(_ name: String, _ port: UInt16) -> String {
+            let bracketed = name.contains(":") ? "[\(name)]" : name
+            return port == 443 ? bracketed : "\(bracketed):\(port)"
+        }
+        let up = XHTTPConnection(download: TLSByteTransport(upload), configuration: configuration(host: authority(authorityHost, port), path: options.path), mode: .streamUp, sessionId: session, useHTTP2: true)
         up.configureRole(.uploadOnly)
         do {
             // Upload SETTINGS completes before any response body is required.
             try await up.performSetup()
             let dl = try await TLSClient(configuration: downloadTLS).connect(host: dlHost, port: dlPort)
-            let down = XHTTPConnection(download: TLSByteTransport(dl), configuration: configuration(host: dlHost, path: dlPath), mode: .streamUp, sessionId: session, useHTTP2: true)
+            let down = XHTTPConnection(download: TLSByteTransport(dl), configuration: configuration(host: authority(options.download.isEmpty ? authorityHost : dlHost, dlPort), path: dlPath), mode: .streamUp, sessionId: session, useHTTP2: true)
             down.configureRole(.downloadOnly)
             do {
                 try await down.performSetup()
