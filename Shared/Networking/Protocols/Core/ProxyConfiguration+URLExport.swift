@@ -252,6 +252,17 @@ extension ProxyConfiguration {
         if configuration.minIdleSession != AnyTLSConfiguration.defaultMinIdleSession {
             parameters.append("mis=\(configuration.minIdleSession)")
         }
+        if configuration.lxAuth { parameters.append("lx-auth=1") }
+        if let lx = configuration.lxHTTP {
+            parameters.append("transport=lx-xhttp")
+            parameters.append("path=\(encodedQueryValue(lx.path))")
+            parameters.append("obfs-key=\(encodedQueryValue(lx.obfsKey))")
+            parameters.append("download=\(encodedQueryValue(lx.download))")
+            parameters.append("download-path=\(encodedQueryValue(lx.downloadPath))")
+            if let port = lx.downloadPort { parameters.append("download-port=\(port)") }
+            parameters.append("padding-min=\(lx.paddingMin)")
+            parameters.append("padding-max=\(lx.paddingMax)")
+        }
         let query = parameters.isEmpty ? "" : "?\(parameters.joined(separator: "&"))"
         return "anytls://\(encodedPassword)@\(bracketedServerAddress):\(serverPort)\(query)#\(fragment)"
     }

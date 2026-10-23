@@ -1,0 +1,55 @@
+name: LX Native iOS
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          candidates = sorted(Path('/Applications').glob('Xcode*.app'), reverse=True)
+          print('\n'.join(map(str,candidates)))
+          for p in candidates:
+              v=subprocess.run([str(p/'Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift'),'--version'],capture_output=True,text=True)
+              print(p,v.stdout)
+          PY
+          xcodebuild -version
+          swift --version
+      - name: Wire regression tests
+        run: |
+          python3 scripts/test_lx_contract.py
+          swiftc -swift-version 6 -parse-as-library Shared/Networking/Protocols/AnyTLS/LXCrypto.swift scripts/LXTestSupport.swift scripts/LXWireTests.swift -o "$RUNNER_TEMP/lx-tests"
+          "$RUNNER_TEMP/lx-tests"
+      - name: Configure self-sign build
+        run: python3 scripts/configure_lx.py
+      - name: Build native iOS
+        run: |
+          set -o pipefail
+          xcodebuild -project Anywhere.xcodeproj -scheme Anywhere -configuration Release -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM='' IPHONEOS_DEPLOYMENT_TARGET=18.0 build 2>&1 | tee build.log
+      - name: Package
+        run: |
+          mkdir -p delivery/Payload
+          cp -R build/Build/Products/Release-iphoneos/Anywhere.app delivery/Payload/LXNative.app
+          python3 scripts/package_lx.py
+          cd delivery
+          zip -qr LXNative-ios-arm64-unsigned.ipa Payload
+          shasum -a 256 LXNative-ios-arm64-unsigned.ipa > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LXNative-iOS
+          path: |
+            delivery/*.ipa
+            delivery/*.plist
+            delivery/SHA256SUMS
+            build.log
+          if-no-files-found: warn

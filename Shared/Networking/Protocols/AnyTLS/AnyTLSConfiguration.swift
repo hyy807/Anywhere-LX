@@ -13,6 +13,8 @@ nonisolated struct AnyTLSConfiguration: Hashable, Sendable {
     static let defaultMinIdleSession = 0
 
     let password: String
+    var lxAuth: Bool = false
+    var lxHTTP: LXHTTPConfiguration? = nil
     
     let idleCheckInterval: Int
     let idleTimeout: Int
@@ -54,6 +56,7 @@ nonisolated struct AnyTLSConfiguration: Hashable, Sendable {
 nonisolated extension AnyTLSConfiguration: Codable {
     private enum CodingKeys: String, CodingKey {
         case password, idleCheckInterval, idleTimeout, minIdleSession, security
+        case lxAuth, lxHTTP
     }
 
     init(from decoder: Decoder) throws {
@@ -65,11 +68,15 @@ nonisolated extension AnyTLSConfiguration: Codable {
             minIdleSession: try container.decodeIfPresent(Int.self, forKey: .minIdleSession) ?? Self.defaultMinIdleSession,
             securityLayer: try container.decode(GenericSecurityLayer.self, forKey: .security)
         )
+        lxAuth = try container.decodeIfPresent(Bool.self, forKey: .lxAuth) ?? false
+        lxHTTP = try container.decodeIfPresent(LXHTTPConfiguration.self, forKey: .lxHTTP)
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(password, forKey: .password)
+        try container.encode(lxAuth, forKey: .lxAuth)
+        try container.encodeIfPresent(lxHTTP, forKey: .lxHTTP)
         try container.encode(idleCheckInterval, forKey: .idleCheckInterval)
         try container.encode(idleTimeout, forKey: .idleTimeout)
         try container.encode(minIdleSession, forKey: .minIdleSession)

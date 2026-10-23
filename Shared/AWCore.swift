@@ -14,8 +14,8 @@ nonisolated final class AWCore {
     // MARK: - Identifiers
 
     enum Identifier {
-        static let appGroupSuite = "group.\(bundle)"
-        static let bundle = "com.argsment.Anywhere"
+        static let appGroupSuite = LXIdentity.appGroup
+        static let bundle = LXIdentity.bundle
         static let errorDomain = bundle
         static let iCloudContainer = "iCloud.\(bundle)"
     }
@@ -136,11 +136,11 @@ nonisolated final class AWCore {
     }
     
     static func getICloudSyncEnabled() -> Bool {
-        userDefaults.bool(forKey: UserDefaultsKey.iCloudSyncEnabled)
+        false // LX self-sign build is deliberately local-only.
     }
 
     static func setICloudSyncEnabled(_ value: Bool) {
-        userDefaults.set(value, forKey: UserDefaultsKey.iCloudSyncEnabled)
+        userDefaults.set(false, forKey: UserDefaultsKey.iCloudSyncEnabled)
     }
     
     // Voyager

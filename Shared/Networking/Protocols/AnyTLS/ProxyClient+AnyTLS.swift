@@ -21,6 +21,9 @@ extension ProxyClient {
         let tunnel = self.tunnel
 
         let dialOut: AnyTLSMultiplexerPool.DialOut = {
+            if let options = anytls.lxHTTP {
+                return try await LXTransport.connect(host: directHost, port: directPort, tls: tlsConfig, options: options, tunnel: tunnel)
+            }
             let tlsClient = TLSClient(configuration: tlsConfig)
             let tlsConnection: TLSRecordConnection
             if let tunnel {
@@ -32,11 +35,11 @@ extension ProxyClient {
         }
         
         let stream: AnyTLSStream
-        if tunnel != nil {
+        if tunnel != nil || anytls.lxAuth || anytls.lxHTTP != nil {
             let connection = try await dialOut()
             let multiplexer = AnyTLSMultiplexer(
                 inner: connection,
-                passwordHash: AnyTLSProtocol.passwordHash(anytls.password),
+                passwordHash: anytls.lxAuth ? try LXWire.authentication(password: anytls.password, milliseconds: UInt64(Date().timeIntervalSince1970 * 1000)) : AnyTLSProtocol.passwordHash(anytls.password),
                 padding: AnyTLSPaddingScheme.default
             )
             _ = multiplexer.tryReserveStream()

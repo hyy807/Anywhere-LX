@@ -14,9 +14,7 @@ struct DataView: View {
         NavigationStack {
             @Bindable var appSettings = appSettings
             List {
-                Toggle(isOn: $appSettings.iCloudSyncEnabled) {
-                    TextWithColorfulIcon(title: "iCloud Sync", systemName: "icloud.fill", foregroundStyle: .blue, backgroundStyle: .white.gradient)
-                }
+                Text("LX Native uses local storage. iCloud sync is disabled in this build.")
             }
             .navigationTitle("Data")
         }

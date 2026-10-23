@@ -78,7 +78,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				CB71CDD42F837D11002B9E1D /* Anywhere Widget.appex in Embed Foundation Extensions */,
+
 				CB1C10822F23B82F00B74CD8 /* Anywhere Network Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -131,6 +131,9 @@
 		CB65476A2F65715600C85E4A /* Exceptions for "Shared" folder in "Anywhere Network Extension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				LXIdentity.swift,
+				Networking/Protocols/AnyTLS/LXWire.swift,
+				Networking/Protocols/AnyTLS/LXCrypto.swift,
 				AWCore.swift,
 				AWNotificationCenter.swift,
 				DataStore/FailableDecodable.swift,
@@ -628,14 +631,13 @@
 				CB1C10622F23B81500B74CD8 /* Frameworks */,
 				CB1C10632F23B81500B74CD8 /* Resources */,
 				CB1C10872F23B82F00B74CD8 /* Embed Foundation Extensions */,
-				7870E4312FF89000006C0F14 /* Embed Watch Content */,
+
 			);
 			buildRules = (
 			);
 			dependencies = (
 				CB1C10812F23B82F00B74CD8 /* PBXTargetDependency */,
-				CB71CDD32F837D11002B9E1D /* PBXTargetDependency */,
-				7870E4332FF89000006C0F14 /* PBXTargetDependency */,
+
 			);
 			fileSystemSynchronizedGroups = (
 				CB1C10672F23B81500B74CD8 /* Anywhere */,

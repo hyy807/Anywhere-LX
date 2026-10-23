@@ -319,21 +319,29 @@ nonisolated extension ProxyConfiguration {
 
         let password = body.userInfo.removingPercentEncoding ?? body.userInfo
         let tlsConfiguration = standardTLSConfiguration(from: parameters, host: body.host)
-
-        return ProxyConfiguration(
-            name: body.fragment ?? "Untitled",
-            serverAddress: body.host,
-            serverPort: body.port,
-            outbound: .anytls(
-                AnyTLSConfiguration(
-                    password: password,
-                    idleCheckInterval: parameters["ici"].flatMap { Int($0) } ?? AnyTLSConfiguration.defaultIdleCheckInterval,
-                    idleTimeout: parameters["it"].flatMap { Int($0) } ?? AnyTLSConfiguration.defaultIdleTimeout,
-                    minIdleSession: parameters["mis"].flatMap { Int($0) } ?? AnyTLSConfiguration.defaultMinIdleSession,
-                    securityLayer: .tls(tlsConfiguration)
-                )
-            )
+        var anytls = AnyTLSConfiguration(
+            password: password,
+            idleCheckInterval: parameters["ici"].flatMap { Int($0) } ?? AnyTLSConfiguration.defaultIdleCheckInterval,
+            idleTimeout: parameters["it"].flatMap { Int($0) } ?? AnyTLSConfiguration.defaultIdleTimeout,
+            minIdleSession: parameters["mis"].flatMap { Int($0) } ?? AnyTLSConfiguration.defaultMinIdleSession,
+            securityLayer: .tls(tlsConfiguration)
         )
+        // Explicit opt-in: a stock 32-hex AnyTLS password must remain SHA256.
+        let transport = parameters["transport"] ?? parameters["type"] ?? ""
+        anytls.lxAuth = parameters["lx-auth"] == "1" || transport == "lx-xhttp"
+        if transport == "lx-xhttp" {
+            anytls.lxHTTP = LXHTTPConfiguration(
+                path: parameters["path"] ?? "/",
+                obfsKey: parameters["obfs-key"] ?? parameters["obfs_key"] ?? "",
+                download: parameters["download"] ?? "",
+                downloadPort: parameters["download-port"].flatMap(UInt16.init),
+                downloadPath: parameters["download-path"] ?? "",
+                paddingMin: parameters["padding-min"].flatMap(Int.init) ?? 100,
+                paddingMax: parameters["padding-max"].flatMap(Int.init) ?? 1000
+            )
+        }
+        if anytls.lxAuth { _ = try LXWire.authentication(password: password, milliseconds: 0) }
+        return ProxyConfiguration(name: body.fragment ?? "Untitled", serverAddress: body.host, serverPort: body.port, outbound: .anytls(anytls))
     }
 
     private static func parseShadowsocks(url: String) throws -> ProxyConfiguration {

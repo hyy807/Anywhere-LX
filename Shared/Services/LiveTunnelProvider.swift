@@ -10,7 +10,7 @@ import NetworkExtension
 
 @MainActor
 final class LiveTunnelProvider: TunnelProviding {
-    static let providerBundleIdentifier = "com.argsment.Anywhere.Network-Extension"
+    static var providerBundleIdentifier: String { LXIdentity.extensionIdentifier }
 
     private var manager: NETunnelProviderManager?
     private var loadedFromPreferences = false
