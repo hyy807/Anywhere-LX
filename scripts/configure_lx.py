@@ -8,6 +8,9 @@ s=re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = "";', s)
 s=s.replace('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;', 'ASSETCATALOG_COMPILER_APPICON_NAME = LXIcon;')
 s=re.sub(r'ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = [^;]*;', 'ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "";', s)
 p.write_text(s)
+for name, rgb in [('HomeBackgroundStart', ('0.06','0.12','0.22')), ('HomeBackgroundEnd', ('0.12','0.28','0.40')), ('StatCardBackground', ('0.15','0.18','0.22'))]:
+    folder=Path('Anywhere/Assets.xcassets')/(name+'.colorset'); folder.mkdir(parents=True,exist_ok=True)
+    (folder/'Contents.json').write_text(json.dumps({'colors':[{'idiom':'universal','color':{'color-space':'srgb','components':dict(zip(['red','green','blue','alpha'],[*rgb,'1.0']))}}],'info':{'author':'LX Native','version':1}}))
 for name in ['Anywhere','Anywhere Network Extension']:
     p=Path(name)/'Info.plist'
     d=plistlib.loads(p.read_bytes()); d['CFBundleDisplayName']='LX Native' if name=='Anywhere' else 'LX Tunnel'
