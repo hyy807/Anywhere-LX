@@ -26,7 +26,7 @@ This fork supplies URL imports, not a claim of complete Clash YAML compatibility
 
 Workflow `.github/workflows/lx-ios.yml` builds native Swift/C for iPhone/iPad arm64, minimum iOS 18. No Go/mihomo replacement, no team/profile embedded, only host + packet tunnel. Re-sign both bundles. Runtime uses the installed bundle IDs and intersects signed App Groups; shared IPC stays in the App Group. No per-device build is needed.
 
-Cloud sync is disabled; local SwiftData storage stays enabled. File imports acquire coordinated bytes under security scope. Proxy-row latency uses a sibling Button and the native proxy data channel, not ICMP or an unproxied TCP ping.
+Cloud sync is disabled; local SwiftData storage stays enabled. The upstream `AnywhereRules` repository is inaccessible (authenticated 404), so no built-in rules database is fabricated or shipped: use Global mode or import rule sets. Private lx-xhttp used as a chained hop is explicitly rejected rather than leaking its download leg outside the chain. File imports acquire coordinated bytes under security scope. Proxy-row latency uses a sibling Button and the native proxy data channel, not ICMP or an unproxied TCP ping.
 
 ## Verification boundaries
 
