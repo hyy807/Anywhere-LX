@@ -85,12 +85,13 @@ extension QUICConnectionCore {
 
         let host = WeakConnectionBox(value: owner)
         let streamForDriver = sealStream
-        rootTask = Task.detached { [host, transport, obfuscator, streamForDriver, localAddr] in
+        let operation: @Sendable () async -> Void = { [host, transport, obfuscator, streamForDriver, localAddr] in
             await Self.runTransportDriver(
                 host: host, transport: transport, obfuscator: obfuscator,
                 sealStream: streamForDriver, localAddr: localAddr
             )
         }
+        rootTask = Task.detached(operation: operation)
     }
 
     @concurrent
