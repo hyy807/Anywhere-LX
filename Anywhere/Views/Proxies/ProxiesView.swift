@@ -453,10 +453,10 @@ struct ProxiesView: View {
     
     @ViewBuilder
     private func proxyRow(_ item: ProxyListItem, group: ProxyGroup? = nil) -> some View {
-        Button {
-            if let configuration = config(item.id) { operations.selection.select(configuration) }
-        } label: {
-            HStack {
+        HStack {
+            Button {
+                if let configuration = config(item.id) { operations.selection.select(configuration) }
+            } label: {
                 VStack(alignment: .leading, spacing: 5) {
                     HStack {
                         Text(item.name)
@@ -487,13 +487,17 @@ struct ProxiesView: View {
                     }
                 }
 
-                Spacer()
-
-                LatencyLabel(latency: item.latency)
-                    .onTapGesture {
-                        if let configuration = config(item.id) { operations.latency.test(configuration) }
-                    }
             }
+            .buttonStyle(.plain)
+            Spacer()
+            Button {
+                if let configuration = config(item.id) { operations.latency.test(configuration) }
+            } label: {
+                LatencyLabel(latency: item.latency)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Test Latency")
+        }
             .padding()
             .background {
                 RoundedRectangle(cornerRadius: 24)
@@ -501,7 +505,6 @@ struct ProxiesView: View {
             }
             .contentShape(RoundedRectangle(cornerRadius: 24))
             .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 24))
-        }
         .buttonStyle(.plain)
         .contextMenu {
             Section {

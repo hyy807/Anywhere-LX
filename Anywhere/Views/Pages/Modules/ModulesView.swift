@@ -172,9 +172,7 @@ struct ModulesView: View {
                 importError = String(localized: "Invalid Anywhere Module File.")
                 return
             }
-            let accessing = url.startAccessingSecurityScopedResource()
-            defer { if accessing { url.stopAccessingSecurityScopedResource() } }
-            let data = try Data(contentsOf: url)
+            let data = try LXFileImport.read(url)
             guard let body = String(data: data, encoding: .utf8) else {
                 importError = String(localized: "Unknown content.")
                 return
