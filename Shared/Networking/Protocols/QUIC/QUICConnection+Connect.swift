@@ -85,7 +85,7 @@ extension QUICConnectionCore {
 
         let host = WeakConnectionBox(value: owner)
         let streamForDriver = sealStream
-        let operation: @Sendable () async -> Void = { [host, transport, obfuscator, streamForDriver, localAddr] in
+        let operation: @isolated(any) @Sendable () async -> Void = { [host, transport, obfuscator, streamForDriver, localAddr] in
             await Self.runTransportDriver(
                 host: host, transport: transport, obfuscator: obfuscator,
                 sealStream: streamForDriver, localAddr: localAddr
