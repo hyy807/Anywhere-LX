@@ -48,6 +48,8 @@ nonisolated struct AnyTLSConfiguration: Hashable, Sendable {
             minIdleSession: base?.minIdleSession ?? Self.defaultMinIdleSession,
             securityLayer: securityLayer
         )
+        lxAuth = base?.lxAuth ?? false
+        lxHTTP = base?.lxHTTP
     }
 
     var tlsConfiguration: TLSConfiguration? { securityLayer.tlsConfiguration }

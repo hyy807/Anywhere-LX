@@ -140,29 +140,7 @@ final class PacketKeys {
         message messageBuffer: UnsafeMutableRawBufferPointer,
         tag tagBuffer: UnsafeMutableRawBufferPointer
     ) throws {
-        var message = messageBuffer.mutableBytes
-        var tag = OutputRawSpan(buffer: tagBuffer, initializedCount: 0)
-        switch self.aead {
-        case .aes128GCM, .aes256GCM:
-            try AES.GCM.seal(
-                inPlace: &message,
-                using: self.key,
-                nonce: AES.GCM.Nonce(data: nonce),
-                authenticating: header.bytes,
-                tag: &tag
-            )
-        case .chaCha20Poly1305:
-            try ChaChaPoly.seal(
-                inPlace: &message,
-                using: self.key,
-                nonce: ChaChaPoly.Nonce(data: nonce),
-                authenticating: header.bytes,
-                tag: &tag
-            )
-        }
-        guard tag.finalize(for: tagBuffer) == AEADAlgorithm.tagLength else {
-            throw AEADError()
-        }
+        try sealCopying(nonce: nonce, header: header, message: messageBuffer, tag: tagBuffer)
     }
 
     private func sealCopying(
@@ -227,25 +205,7 @@ final class PacketKeys {
         message messageBuffer: UnsafeMutableRawBufferPointer,
         tag: UnsafeRawBufferPointer
     ) throws {
-        var message = messageBuffer.mutableBytes
-        switch self.aead {
-        case .aes128GCM, .aes256GCM:
-            try AES.GCM.open(
-                inPlace: &message,
-                using: self.key,
-                nonce: AES.GCM.Nonce(data: nonce),
-                authenticating: header.bytes,
-                tag: tag.bytes
-            )
-        case .chaCha20Poly1305:
-            try ChaChaPoly.open(
-                inPlace: &message,
-                using: self.key,
-                nonce: ChaChaPoly.Nonce(data: nonce),
-                authenticating: header.bytes,
-                tag: tag.bytes
-            )
-        }
+        try openCopying(nonce: nonce, header: header, ciphertext: UnsafeRawBufferPointer(messageBuffer), tag: tag, into: messageBuffer)
     }
 
     private func openCopying(

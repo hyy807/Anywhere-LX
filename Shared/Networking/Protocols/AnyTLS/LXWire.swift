@@ -62,6 +62,7 @@ nonisolated final class LXObfsConnection: ProxyConnection {
 
 nonisolated enum LXTransport {
     static func connect(host: String, port: UInt16, tls: TLSConfiguration, options: LXHTTPConfiguration, tunnel: ProxyConnection?) async throws -> ProxyConnection {
+        guard tunnel == nil else { throw LXWire.failure("LX split transport cannot reuse one chain tunnel for two TLS connections") }
         let session = UUID().uuidString.lowercased()
         func configuration(host: String, path: String) -> XHTTPConfiguration {
             let normalized = "/" + path.split(separator: "/").joined(separator: "/") + (path == "/" ? "" : "/")
