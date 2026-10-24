@@ -81,53 +81,28 @@ nonisolated enum LatencyTester {
         }
 
         let client = ProxyClient(configuration: configuration, useResolvedAddressForDirectDial: true)
-
+        let clock = ContinuousClock()
+        let start = clock.now
         do {
-            let ms = try await withTaskCancellationHandler {
-                let proxyConnection = try await Self.establishWarmedConnection(client: client)
-                
-                let httpRequest = "HEAD / HTTP/1.1\r\nHost: \(Self.latencyHost)\r\nConnection: close\r\n\r\n".data(using: .utf8)!
-                try await proxyConnection.send(httpRequest)
-                
-                let clock = ContinuousClock()
-                let start = clock.now
-
-                let responseData = try await proxyConnection.receive()
-
-                let elapsed = clock.now - start
-
-                let statusLine = responseData.flatMap { String(data: $0, encoding: .utf8) }?
-                    .split(separator: "\r\n", maxSplits: 1).first.map(String.init)
-                guard let statusLine, statusLine.contains("200") else {
-                    throw AnywhereError.diagnostics(.latencyProbeFailed(status: statusLine ?? "no response"))
-                }
-
-                return Int(elapsed.components.seconds * 1000 + elapsed.components.attoseconds / 1_000_000_000_000_000)
-            } onCancel: {
-                client.cancel()
+            // One probe per connection. The previous implementation sent a
+            // warm-up request without Connection: keep-alive, then reused the
+            // server-closed connection for the measured request. That made a
+            // healthy node report timeout/no response.
+            let proxyConnection = try await client.connect(to: Self.latencyHost, port: Self.latencyPort)
+            let httpRequest = "HEAD / HTTP/1.1\r\nHost: \(Self.latencyHost)\r\nConnection: close\r\n\r\n".data(using: .utf8)!
+            try await proxyConnection.send(httpRequest)
+            let responseData = try await proxyConnection.receive()
+            let statusLine = responseData.flatMap { String(data: $0, encoding: .utf8) }?
+                .split(separator: "\r\n", maxSplits: 1).first.map(String.init)
+            guard let statusLine, statusLine.contains("200") else {
+                throw AnywhereError.diagnostics(.latencyProbeFailed(status: statusLine ?? "no response"))
             }
+            let elapsed = clock.now - start
             await client.cancel()
-            return ms
+            return Int(elapsed.components.seconds * 1000 + elapsed.components.attoseconds / 1_000_000_000_000_000)
         } catch {
             await client.cancel()
             throw error
         }
-    }
-    
-    private static func establishWarmedConnection(client: ProxyClient) async throws -> ProxyConnection {
-        let proxyConnection = try await client.connect(to: Self.latencyHost, port: Self.latencyPort)
-        
-        let warmupRequest = "HEAD / HTTP/1.1\r\nHost: \(Self.latencyHost)\r\n\r\n".data(using: .utf8)!
-        try await proxyConnection.send(warmupRequest)
-
-        let warmupData = try await proxyConnection.receive()
-
-        let warmupStatus = warmupData.flatMap { String(data: $0, encoding: .utf8) }?
-            .split(separator: "\r\n", maxSplits: 1).first.map(String.init)
-        guard let warmupStatus, warmupStatus.contains("200") else {
-            throw AnywhereError.diagnostics(.latencyProbeFailed(status: warmupStatus ?? "no response"))
-        }
-
-        return proxyConnection
     }
 }

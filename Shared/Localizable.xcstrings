@@ -21218,6 +21218,106 @@
           }
         }
       }
+    },
+    "LX Native" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LX 原生版"
+          }
+        }
+      }
+    },
+    "Native networking. Your device. Your settings." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原生网络。你的设备，你的设置。"
+          }
+        }
+      }
+    },
+    "Local storage" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地存储"
+          }
+        }
+      }
+    },
+    "Independent build" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "独立构建"
+          }
+        }
+      }
+    },
+    "Themes and original LX icons are available locally without an App Store purchase." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主题和 LX 原创图标均可本地使用，无需 App Store 购买。"
+          }
+        }
+      }
+    },
+    "About this build" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于此构建"
+          }
+        }
+      }
+    },
+    "Local storage only" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅本地存储"
+          }
+        }
+      }
+    },
+    "iCloud and upstream Store membership require the publisher's services and are not provided by this independent build." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 和上游会员服务需要发布者提供，本独立构建不提供。"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "More" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更多"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

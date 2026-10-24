@@ -191,7 +191,8 @@ nonisolated struct ClashProxyParser {
                 alpn: alpn,
                 echEnabled: ech.enabled,
                 echConfig: ech.config,
-                fingerprint: fingerprint
+                fingerprint: fingerprint,
+                insecureSkipVerify: getBool(node, key: "skip-cert-verify") ?? false
             ))
         } else {
             xraySecurityLayer = .none
