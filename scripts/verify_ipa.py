@@ -19,7 +19,7 @@ for prefix,info in [(root,main),(exts[0][:-10],ext)]:
         if cmd==0x1d: signature=True
         cursor+=size
     assert not signature
-    for marker in [b'LX invalid obfs sync marker',b'LX password must be 32 hex characters',b'com.apple.security.application-groups']:
+    for marker in [b'LX invalid obfs sync marker',b'LX password must be 32 ASCII hex characters',b'com.apple.security.application-groups']:
         assert marker in d,(prefix,marker)
     report['binaries'].append({'path':prefix+info['CFBundleExecutable'],'bytes':len(d),'native_LX_markers':True,'LC_CODE_SIGNATURE':False})
 print(json.dumps(report,indent=2,default=str))
