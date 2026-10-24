@@ -36,6 +36,29 @@ nonisolated struct ClashProxyParser {
             }
         }
 
+        // Clash's `dialer-proxy` may reference a proxy or a select group. The
+        // native model stores the equivalent hop in `chain`; dropping it makes
+        // imported nodes silently dial direct.
+        let byName = Dictionary(configurations.map { ($0.name, $0) }, uniquingKeysWith: { first, _ in first })
+        let groups = root["proxy-groups"]
+        var groupMembers: [String: [String]] = [:]
+        if groups.type == .sequence {
+            for group in groups where group.type == .map {
+                guard let name = getString(group, key: "name"),
+                      let members = getStringSequence(group, key: "proxies") else { continue }
+                groupMembers[name] = members
+            }
+        }
+        configurations = configurations.map { configuration in
+            guard let source = proxies.first(where: {
+                $0.type == .map && getString($0, key: "name") == configuration.name
+            }), let dialer = getString(source, key: "dialer-proxy") else { return configuration }
+            let hopName = byName[dialer] != nil
+                ? dialer
+                : groupMembers[dialer]?.first(where: { $0 != "DIRECT" && byName[$0] != nil })
+            guard let hopName, let hop = byName[hopName], hop.id != configuration.id else { return configuration }
+            return configuration.withChain([hop])
+        }
         return ParseResult(configurations: configurations, skippedCount: skippedCount)
     }
 
@@ -356,7 +379,8 @@ nonisolated struct ClashProxyParser {
             alpn: getStringSequence(node, key: "alpn"),
             echEnabled: ech.enabled,
             echConfig: ech.config,
-            fingerprint: parseFingerprint(node)
+            fingerprint: parseFingerprint(node),
+            insecureSkipVerify: getBool(node, key: "skip-cert-verify") ?? false
         )
 
         var anytls = AnyTLSConfiguration(

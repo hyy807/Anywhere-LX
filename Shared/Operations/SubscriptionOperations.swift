@@ -20,7 +20,8 @@ struct SubscriptionOperations {
                 id: configuration.id, name: configuration.name,
                 serverAddress: configuration.serverAddress, serverPort: configuration.serverPort,
                 subscriptionId: subscription.id,
-                outbound: configuration.outbound
+                outbound: configuration.outbound,
+                chain: configuration.chain
             )
         }
         configurationStore.replaceConfigurations(for: subscription.id, with: tagged)
@@ -70,7 +71,8 @@ struct SubscriptionOperations {
                 id: id, name: configuration.name,
                 serverAddress: configuration.serverAddress, serverPort: configuration.serverPort,
                 subscriptionId: subscriptionId,
-                outbound: configuration.outbound
+                outbound: configuration.outbound,
+                chain: configuration.chain
             ))
         }
 
