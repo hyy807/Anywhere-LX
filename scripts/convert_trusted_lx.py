@@ -24,8 +24,8 @@ def convert(node):
     if not 1 <= port <= 65535:
         raise ValueError('Invalid server port')
     query = {'lx-auth': '1', 'sni': node.get('sni') or node.get('servername') or node['server']}
-    if node.get('skip-cert-verify'):
-        query['allowInsecure'] = '1'
+    # Native URL TLS parser has no skip-verification switch. Do not emit an
+    # ignored allowInsecure flag or claim the provider setting was preserved.
     transport = node.get('transport')
     if transport:
         if not isinstance(transport, dict) or transport.get('type') not in ('lx-xhttp', 'xhttp', 'lightxtreme', '闪电旋风劈'):

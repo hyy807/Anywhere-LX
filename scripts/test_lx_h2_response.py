@@ -2,7 +2,7 @@
 """Run the real Swift H2 receive loop against bytes from a local TLS/H2 fixture.
 Networking adapter is Python ssl/h2; this is NOT the iOS TLSClient integration.
 """
-import os, socket, ssl, subprocess, tempfile, threading
+import os, shutil, socket, ssl, subprocess, tempfile, threading
 from pathlib import Path
 from h2.config import H2Configuration
 from h2.connection import H2Connection
@@ -98,7 +98,9 @@ semaphore.wait()
     script=tmp/'main.swift'; script.write_text(source)
     env=os.environ.copy()
     if env.get('SWIFT_LIBRARY_PATH'): env['LD_LIBRARY_PATH']=env['SWIFT_LIBRARY_PATH']
-    frontend=env.get('SWIFT_FRONTEND','swift-frontend')
+    frontend=shutil.which(env.get('SWIFT_FRONTEND','swift-frontend'))
+    if frontend is None:
+        raise RuntimeError('Swift frontend not found on PATH')
     obj=tmp/'main.o'; binary=tmp/'test'
     subprocess.run([frontend,'-c','-O','-swift-version','6',str(script),'-o',str(obj)],env=env,check=True)
     swiftlib=str(Path(frontend).resolve().parents[1]/'lib/swift/linux')
