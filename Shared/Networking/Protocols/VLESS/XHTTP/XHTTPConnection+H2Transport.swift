@@ -448,13 +448,16 @@ extension XHTTPConnection {
 
             case Self.h2FrameHeaders:
                 if isDownloadStream {
+                    if !state.withLock({ $0.h2ResponseReceived }) {
+                        if let rejection = checkH2ResponseStatus(frame.payload) {
+                            markH2Closed()
+                            throw AnywhereError.proxy(.xhttp, .handshakeFailed(detail: "H2 response rejected: \(rejection)"))
+                        }
+                        state.withLock { $0.h2ResponseReceived = true }
+                    }
                     if frame.flags & Self.h2FlagEndStream != 0 {
                         markH2Closed()
                         return nil
-                    } else if !state.withLock({ $0.h2ResponseReceived }) {
-                        if checkH2ResponseStatus(frame.payload) == nil {
-                            state.withLock { $0.h2ResponseReceived = true }
-                        }
                     }
                 }
 

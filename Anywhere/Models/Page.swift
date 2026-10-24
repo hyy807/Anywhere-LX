@@ -63,7 +63,7 @@ enum Page: Equatable, Hashable, Identifiable, CaseIterable {
     
     var symbol: String {
         switch self {
-        case .launchpad: "anywhere"
+        case .launchpad: "lx"
         case .dashboard: "rectangle.3.group"
         case .toolbox: "latch.2.case"
         case .data: "cylinder.split.1x2"

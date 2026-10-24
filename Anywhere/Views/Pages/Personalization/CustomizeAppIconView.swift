@@ -19,31 +19,28 @@ struct AppIconOption: Identifiable {
         AppIconOption(
             alternateName: nil,
             displayName: "Default",
-            previewName: "AppIcon-Sample"
+            previewName: "LXIcon-Sample"
         ),
         AppIconOption(
-            alternateName: "AppIcon-Classic",
+            alternateName: "LXIcon-Classic",
             displayName: "Classic",
-            previewName: "AppIcon-Classic-Sample"
+            previewName: "LXIcon-Classic-Sample"
         ),
         AppIconOption(
-            alternateName: "AppIcon-Muted",
+            alternateName: "LXIcon-Muted",
             displayName: "Muted",
-            previewName: "AppIcon-Muted-Sample"
+            previewName: "LXIcon-Muted-Sample"
         ),
     ]
 }
 
 struct CustomizeAppIconView: View {
-    @Environment(VoyagerStore.self) private var voyagerStore
+    // LX Native: original icons are available without StoreKit.
     @State private var selectedName: String? = UIApplication.shared.alternateIconName
     @State private var errorMessage: String?
 
     var body: some View {
         Form {
-            if !voyagerStore.isMember {
-                VoyagerNotice(description: "Custom app icons are available to Anywhere Voyager members.")
-            }
             Section {
                 ForEach(AppIconOption.all) { option in
                     Button {
@@ -52,7 +49,6 @@ struct CustomizeAppIconView: View {
                         row(for: option)
                     }
                     .buttonStyle(.plain)
-                    .disabled(!voyagerStore.isMember)
                 }
             }
         }
@@ -103,7 +99,7 @@ struct CustomizeAppIconView: View {
     }
 
     private func select(_ option: AppIconOption) {
-        guard voyagerStore.isMember, selectedName != option.alternateName else { return }
+        guard selectedName != option.alternateName else { return }
         let previous = selectedName
         selectedName = option.alternateName
         UIApplication.shared.setAlternateIconName(option.alternateName) { error in

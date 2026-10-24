@@ -9,16 +9,13 @@ import SwiftUI
 import UIKit
 
 struct CustomizeThemeView: View {
-    @Environment(VoyagerStore.self) private var voyagerStore
+    // LX Native: local personalization needs no StoreKit entitlement.
     @Environment(AppSettings.self) private var settings
     @State private var screenAspectRatio: CGFloat = 393 / 852
 
     var body: some View {
         @Bindable var settings = settings
         Form {
-            if !voyagerStore.isMember {
-                VoyagerNotice(description: "Custom themes are available to Anywhere Voyager members.")
-            }
             
             backgroundSection(
                 "Background (Light)",
@@ -90,7 +87,6 @@ struct CustomizeThemeView: View {
         } header: {
             Text(header)
         }
-        .disabled(!voyagerStore.isMember)
     }
     
     private func statCardSection(
@@ -106,7 +102,6 @@ struct CustomizeThemeView: View {
         } header: {
             Text(header)
         }
-        .disabled(!voyagerStore.isMember)
     }
     
     private func previewSection(

@@ -252,7 +252,7 @@ private struct ConfigurationCapsule: View {
             ProminentCapsule {
                 HStack {
                     HStack {
-                        Image("anywhere.fill")
+                        Image("lx.fill")
                             .font(.body.weight(.medium))
                         Text(configuration.name)
                             .font(.body.weight(.medium))

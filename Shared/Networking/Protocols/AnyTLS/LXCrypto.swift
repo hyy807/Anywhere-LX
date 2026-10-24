@@ -5,7 +5,10 @@ import CommonCrypto
 
 nonisolated enum LXWire {
     static func authentication(password: String, milliseconds: UInt64) throws -> Data {
-        guard password.utf8.count == 32 else { throw failure("LX password must be 32 hex characters") }
+        guard password.utf8.count == 32,
+              password.utf8.allSatisfy({ (48...57).contains($0) || (65...70).contains($0) || (97...102).contains($0) }) else {
+            throw failure("LX password must be 32 ASCII hex characters")
+        }
         var raw = Data()
         var index = password.startIndex
         for _ in 0..<16 {

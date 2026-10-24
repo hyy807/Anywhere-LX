@@ -359,19 +359,41 @@ nonisolated struct ClashProxyParser {
             fingerprint: parseFingerprint(node)
         )
 
+        var anytls = AnyTLSConfiguration(
+            password: password,
+            idleCheckInterval: idleCheckInterval,
+            idleTimeout: idleTimeout,
+            minIdleSession: minIdleSession,
+            securityLayer: .tls(tlsConfiguration)
+        )
+        let transport = node["transport"]
+        let transportType = (getString(transport, key: "type") ?? getString(node, key: "transport") ?? "").lowercased()
+        let privateTypes = ["lx-xhttp", "xhttp", "lightxtreme", "闪电旋风劈"]
+        // Match the proven LX adapter's nested and legacy flattened layouts.
+        // Never reinterpret a stock hexadecimal password as private authentication.
+        let flatLX = getString(node, key: "obfs-key") != nil || getString(node, key: "path") != nil || getString(node, key: "download") != nil
+        if !transportType.isEmpty && !privateTypes.contains(transportType) { return nil }
+        if privateTypes.contains(transportType) || flatLX {
+            let download = transport["download"]
+            let port = getInt(download, key: "port") ?? getInt(node, key: "download-port")
+            if let port, !(1...65535).contains(port) { return nil }
+            anytls.lxHTTP = LXHTTPConfiguration(
+                path: getString(transport, key: "path") ?? getString(node, key: "path") ?? "/",
+                obfsKey: getString(transport, key: "obfs-key") ?? getString(node, key: "obfs-key") ?? "",
+                download: getString(download, key: "server") ?? getString(node, key: "download") ?? "",
+                downloadPort: port.map { UInt16($0) },
+                downloadPath: getString(download, key: "path") ?? getString(node, key: "download-path") ?? "",
+                paddingMin: getInt(transport, key: "padding-min") ?? getInt(node, key: "padding-min") ?? 100,
+                paddingMax: getInt(transport, key: "padding-max") ?? getInt(node, key: "padding-max") ?? 1000
+            )
+        }
+        anytls.lxAuth = getBool(node, key: "lx-auth") == true || anytls.lxHTTP != nil
+        if anytls.lxAuth, (try? LXWire.authentication(password: password, milliseconds: 0)) == nil { return nil }
         return ProxyConfiguration(
             name: basics.name,
             serverAddress: basics.server,
             serverPort: basics.port,
-            outbound: .anytls(
-                AnyTLSConfiguration(
-                    password: password,
-                    idleCheckInterval: idleCheckInterval,
-                    idleTimeout: idleTimeout,
-                    minIdleSession: minIdleSession,
-                    securityLayer: .tls(tlsConfiguration)
-                )
-            )
+            outbound: .anytls(anytls)
         )
     }
 

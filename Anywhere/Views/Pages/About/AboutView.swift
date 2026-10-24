@@ -14,7 +14,7 @@ struct AboutView: View {
                 Section {
                     Link(destination: URL(string: "https://t.me/anywhere_official_group")!) {
                         HStack {
-                            TextWithColorfulIconAndCustomImage(title: "Join Telegram Group", imageName: "TelegramSymbol", foregroundStyle: .white, backgroundStyle: .blue.gradient)
+                            TextWithColorfulIcon(title: "Upstream Telegram Group", systemName: "paperplane.fill", foregroundStyle: .white, backgroundStyle: .blue.gradient)
                             Spacer()
                             Image(systemName: "arrow.up.right")
                                 .font(.footnote.bold())

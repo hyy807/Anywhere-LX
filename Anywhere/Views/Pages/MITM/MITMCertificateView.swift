@@ -75,7 +75,7 @@ struct MITMCertificateView: View {
         Form {
             Section {
                 HStack {
-                    Image("certificate")
+                    Image(systemName: "checkmark.seal.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 60)

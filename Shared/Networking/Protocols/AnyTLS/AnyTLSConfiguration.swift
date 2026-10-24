@@ -70,8 +70,8 @@ nonisolated extension AnyTLSConfiguration: Codable {
             minIdleSession: try container.decodeIfPresent(Int.self, forKey: .minIdleSession) ?? Self.defaultMinIdleSession,
             securityLayer: try container.decode(GenericSecurityLayer.self, forKey: .security)
         )
-        lxAuth = try container.decodeIfPresent(Bool.self, forKey: .lxAuth) ?? false
         lxHTTP = try container.decodeIfPresent(LXHTTPConfiguration.self, forKey: .lxHTTP)
+        lxAuth = (try container.decodeIfPresent(Bool.self, forKey: .lxAuth) ?? false) || lxHTTP != nil
     }
 
     func encode(to encoder: Encoder) throws {

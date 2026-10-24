@@ -6,7 +6,24 @@ on:
 permissions:
   contents: read
 jobs:
+  swift-regressions:
+    runs-on: ubuntu-22.04
+    container: swift:6.2.1-jammy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install fixture dependencies
+        run: apt-get update && apt-get install -y python3 python3-h2 libyaml-dev openssl gcc
+      - name: Execute production Swift seams and resource checks
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: |
+          python3 scripts/test_lx_theme.py
+          python3 scripts/test_lx_contract.py
+          python3 scripts/test_lx_import_seam.py
+          python3 scripts/test_lx_h2_response.py
+          LX_FIXTURE_STATUS=200 python3 scripts/test_lx_h2_response.py
   build:
+    needs: swift-regressions
     runs-on: macos-26
     timeout-minutes: 60
     steps:
